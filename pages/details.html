@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epic Game Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff5722;
+            --secondary: #2196f3;
+            --dark: #121212;
+            --dark-secondary: #1e1e1e;
+            --light: #f5f5f5;
+            --gray: #9e9e9e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-bar input {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: none;
+            background-color: var(--dark-secondary);
+            color: var(--light);
+            outline: none;
+            width: 200px;
+            transition: width 0.3s;
+        }
+        
+        .search-bar input:focus {
+            width: 250px;
+        }
+        
+        .search-bar button {
+            background: none;
+            border: none;
+            color: var(--light);
+            cursor: pointer;
+            margin-left: -35px;
+        }
+        
+        /* Main Content Styles */
+        main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Home Page Styles */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            z-index: 2;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            bottom: -10px;
+            left: 0;
+            border-radius: 2px;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .game-card {
+            background-color: var(--dark-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .game-card-content {
+            padding: 1.5rem;
+        }
+        
+        .game-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .game-card .genre {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .game-card .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #ffc107;
+            margin-bottom: 1rem;
+        }
+        
+        .game-card .price {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .game-card .platforms {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        
+        .game-card .platforms i {
+            color: var(--gray);
+            font-size: 1.2rem;
+        }
+        
+        /* Game Details Page Styles */
+        .game-details {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--light);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            transition: color 0.3s;
+        }
+        
+        .back-btn:hover {
+            color: var(--primary);
+        }
+        
+        .game-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .game-poster {
+            width: 300px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-info {
+            flex: 1;
+        }
+        
+        .game-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .game-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .game-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray);
+        }
+        
+        .game-meta-item i {
+            color: var(--primary);
+        }
+        
+        .game-description {
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        
+        .game-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .spec-card {
+            background-color: var(--dark-secondary);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .spec-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .screenshots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .screenshot {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .screenshot:hover {
+            transform: scale(1.05);
+        }
+        
+        .buy-now {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 2rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+        
+        .buy-now h3 {
+            font-size: 1.5rem;
+        }
+        
+        .price-tag {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-links a {
+            color: var(--light);
+            background-color: var(--dark-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary);
+        }
+        
+        .copyright {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--dark-secondary);
+            color: var(--gray);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .game-header {
+                flex-direction: column;
+            }
+            
+            .game-poster {
+                width: 100%;
+                height: auto;
+                max-height: 500px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .game-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .buy-now {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-gamepad"></i>
+            <h1>GameNexus</h1>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Search games...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+    </header>
+    
+    <main>
+        <!-- Home Page -->
+        <div id="home-page">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-content">
+                        <h2>Discover Your Next Adventure</h2>
+                        <p>Explore our curated collection of the most exciting games across all platforms. Find your perfect match and dive into new worlds today!</p>
+                        <a href="#" class="btn" data-page="games">Browse Games</a>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">Featured Games</h2>
+                <div class="games-grid">
+                    <!-- Game cards will be inserted here by JavaScript -->
+                </div>
+                
+                <h2 class="section-title">New Releases</h2>
+                <div class="games-grid">
+                    <!-- Game cards will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Details Page -->
+        <div id="game-details-page" class="game-details">
+            <div class="container">
+                <a href="#" class="back-btn" data-page="home">
+                    <i class="fas fa-arrow-left"></i> Back to Games
+                </a>
+                
+                <div class="game-header">
+                    <img id="detail-poster" src="" alt="Game Poster" class="game-poster">
+                    <div class="game-info">
+                        <h1 id="detail-title" class="game-title">Game Title</h1>
+                        <div class="game-meta">
+                            <div class="game-meta-item">
+                                <i class="fas fa-star"></i>
+                                <span id="detail-rating">4.5/5</span>
+                            </div>
+                            <div class="game-meta-item">
+                                <i class="fas fa-gamepad"></i>
+                                <span id="detail-genre">Action, Adventure</span>
+                            </div>
+                            <div class="game-meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="detail-release">2023</span>
+                            </div>
+                            <div class="game-meta-item">
+                                <i class="fas fa-users"></i>
+                                <span id="detail-players">Single/Multiplayer</span>
+                            </div>
+                        </div>
+                        <p id="detail-description" class="game-description">
+                            Game description goes here...
+                        </p>
+                        <div class="platforms">
+                            <i class="fab fa-windows" title="Windows"></i>
+                            <i class="fab fa-playstation" title="PlayStation"></i>
+                            <i class="fab fa-xbox" title="Xbox"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">Game Details</h2>
+                <div class="game-specs">
+                    <div class="spec-card">
+                        <h3>Developer</h3>
+                        <p id="detail-developer">Game Studio</p>
+                    </div>
+                    <div class="spec-card">
+                        <h3>Publisher</h3>
+                        <p id="detail-publisher">Publisher Inc.</p>
+                    </div>
+                    <div class="spec-card">
+                        <h3>Platforms</h3>
+                        <p id="detail-platforms">PC, PlayStation, Xbox</p>
+                    </div>
+                    <div class="spec-card">
+                        <h3>System Requirements</h3>
+                        <p id="detail-requirements">Minimum specs...</p>
+                    </div>
+                </div>
+                
+                <h2 class="section-title">Screenshots</h2>
+                <div class="screenshots" id="detail-screenshots">
+                    <!-- Screenshots will be inserted here by JavaScript -->
+                </div>
+                
+                <div class="buy-now">
+                    <div>
+                        <h3>Ready to Play?</h3>
+                        <p>Get instant access to this amazing game today!</p>
+                    </div>
+                    <div>
+                        <span class="price-tag" id="detail-price">$59.99</span>
+                        <a href="#" class="btn">Buy Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+ 
+    <script>
+        // Game Data
+        const games = [
+            {
+                id: 1,
+                title: "EGYPT AND WORLD SPACE WARS",
+                genre: "Action/Strategy",
+                rating: "4.5/5",
+                price: "$49.99",
+                release: "2022",
+                players: "Online Multiplayer",
+                poster: "https://www.videogamer.com/wp-content/uploads/f26b563f-c0e7-49e9-8cc5-c29a9ad03421_4ce28645-3b54-4228-8af8-bc55b927531c_aco_ff_header_316187-1.jpg",
+                description: "Egypt and World Space Wars combines ancient Egyptian mythology with futuristic space warfare. Players command fleets of spaceships designed with Egyptian aesthetics, battling for control of the solar system. The game features a unique blend of strategy and action elements, with both single-player campaigns and massive online multiplayer battles.",
+                developer: "Pharaoh Interactive",
+                publisher: "Ancient Games Studio",
+                platforms: "PC, PlayStation 5, Xbox Series X",
+                requirements: "Intel i5, 8GB RAM, GTX 1060",
+                screenshots: [
+                    "https://www.videogamer.com/wp-content/uploads/f26b563f-c0e7-49e9-8cc5-c29a9ad03421_4ce28645-3b54-4228-8af8-bc55b927531c_aco_ff_header_316187-1.jpg",
+                    "https://wallpaperaccess.com/full/338753.jpg",
+                    "https://en.shiftdelete.net/wp-content/uploads/2023/05/system-requirements-assassins-creed-origins-1-1024x576.jpg"
+                ]
+            },
+            {
+                id: 2,
+                title: "RETURN OF THE CARS",
+                genre: "Racing/Action",
+                rating: "4.2/5",
+                price: "$39.99",
+                release: "2021",
+                players: "Online Multiplayer",
+                poster: "https://sinisterside.com/wp-content/uploads/2017/12/nfs-7.jpg",
+                description: "Return of the Cars brings back the golden age of vehicular combat games with modern graphics and physics. Players can choose from dozens of customizable vehicles, from muscle cars to futuristic prototypes, each with unique weapons and abilities. The game features both traditional racing modes and full-combat battle arenas.",
+                developer: "Gearshift Games",
+                publisher: "Velocity Interactive",
+                platforms: "PC, PlayStation 4/5, Xbox One/Series X, Nintendo Switch",
+                requirements: "Intel i5, 8GB RAM, GTX 970",
+                screenshots: [
+                    "https://sinisterside.com/wp-content/uploads/2017/12/nfs-7.jpg",
+                    "https://sinisterside.com/wp-content/uploads/2017/12/nfs-7.jpg",
+                    "https://sinisterside.com/wp-content/uploads/2017/12/nfs-7.jpg"
+                ]
+            },
+            {
+                id: 3,
+                title: "CYBERPUNK 2077",
+                genre: "RPG/Action",
+                rating: "4.0/5",
+                price: "$59.99",
+                release: "2020",
+                players: "Single-player",
+                poster: "https://sm.ign.com/t/ign_nordic/video/c/cyberpunk-/cyberpunk-2077-biggest-changes-in-the-21-update_wzje.1200.jpg",
+                description: "Cyberpunk 2077 is an open-world, action-adventure story set in Night City, a megalopolis obsessed with power, glamour and body modification. You play as V, a mercenary outlaw going after a one-of-a-kind implant that is the key to immortality. You can customize your character's cyberware, skillset and playstyle, and explore a vast city where the choices you make shape the story and the world around you.",
+                developer: "CD Projekt Red",
+                publisher: "CD Projekt",
+                platforms: "PC, PlayStation 4/5, Xbox One/Series X",
+                requirements: "Intel i7-6700, 16GB RAM, GTX 1060 (Recommended)",
+                screenshots: [
+                    "https://sm.ign.com/t/ign_nordic/video/c/cyberpunk-/cyberpunk-2077-biggest-changes-in-the-21-update_wzje.1200.jpg",
+                    "https://sm.ign.com/t/ign_nordic/video/c/cyberpunk-/cyberpunk-2077-biggest-changes-in-the-21-update_wzje.1200.jpg",
+                    "https://sm.ign.com/t/ign_nordic/video/c/cyberpunk-/cyberpunk-2077-biggest-changes-in-the-21-update_wzje.1200.jpg"
+                ]
+            },
+            {
+                id: 4,
+                title: "GRAND THEFT AUTO V",
+                genre: "Action/Adventure",
+                rating: "4.8/5",
+                price: "$29.99",
+                release: "2013 (2022 Next-Gen)",
+                players: "Online Multiplayer",
+                poster: "https://img.ricardostatic.ch/images/3ac6ad78-50c4-49ab-95df-b3a1e3390ae5/t_1800x1350/grand-theft-auto-v-gta-5-strassengauner-bankrauber-xb-one",
+                description: "Grand Theft Auto V for PC offers players the option to explore the award-winning world of Los Santos and Blaine County in resolutions of up to 4k and beyond, as well as the chance to experience the game running at 60 frames per second. The game delivers across-the-board enhancements including increased draw distances, finer texture details, denser traffic, and new wildlife.",
+                developer: "Rockstar North",
+                publisher: "Rockstar Games",
+                platforms: "PC, PlayStation 3/4/5, Xbox 360/One/Series X",
+                requirements: "Intel i5, 8GB RAM, GTX 660 (Minimum)",
+                screenshots: [
+                    "https://img.ricardostatic.ch/images/3ac6ad78-50c4-49ab-95df-b3a1e3390ae5/t_1800x1350/grand-theft-auto-v-gta-5-strassengauner-bankrauber-xb-one",
+                    "https://img.ricardostatic.ch/images/3ac6ad78-50c4-49ab-95df-b3a1e3390ae5/t_1800x1350/grand-theft-auto-v-gta-5-strassengauner-bankrauber-xb-one",
+                    "https://img.ricardostatic.ch/images/3ac6ad78-50c4-49ab-95df-b3a1e3390ae5/t_1800x1350/grand-theft-auto-v-gta-5-strassengauner-bankrauber-xb-one"
+                ]
+            },
+            {
+                id: 5,
+                title: "UNCHARTED 4: A THIEF'S END",
+                genre: "Action/Adventure",
+                rating: "4.9/5",
+                price: "$49.99",
+                release: "2016 (2022 PC Port)",
+                players: "Multiplayer",
+                poster: "https://th.bing.com/th/id/OIP.lB_XYbFgFnPfofJWMkkTdQHaEK?cb=iwc1&rs=1&pid=ImgDetMain",
+                description: "Uncharted 4: A Thief's End is an action-adventure game played from a third-person perspective, with platforming elements. Players traverse several environments, moving through locations including towns, buildings, and wilderness to advance through the game's story. Players use melee combat, firearms, and stealth to defend against hostile enemies.",
+                developer: "Naughty Dog",
+                publisher: "Sony Interactive Entertainment",
+                platforms: "PlayStation 4, PC (2022)",
+                requirements: "Intel i7-4770, 16GB RAM, GTX 1060 (PC)",
+                screenshots: [
+                    "https://th.bing.com/th/id/OIP.lB_XYbFgFnPfofJWMkkTdQHaEK?cb=iwc1&rs=1&pid=ImgDetMain",
+                    "https://th.bing.com/th/id/OIP.lB_XYbFgFnPfofJWMkkTdQHaEK?cb=iwc1&rs=1&pid=ImgDetMain",
+                    "https://th.bing.com/th/id/OIP.lB_XYbFgFnPfofJWMkkTdQHaEK?cb=iwc1&rs=1&pid=ImgDetMain"
+                ]
+            }
+        ];
+
+        // DOM Elements
+        const homePage = document.getElementById('home-page');
+        const gameDetailsPage = document.getElementById('game-details-page');
+        const gamesGrid = document.querySelector('.games-grid');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        // Render Games
+        function renderGames() {
+            gamesGrid.innerHTML = '';
+            
+            games.forEach(game => {
+                const gameCard = document.createElement('div');
+                gameCard.className = 'game-card';
+                gameCard.dataset.id = game.id;
+                
+                gameCard.innerHTML = `
+                    <img src="${game.poster}" alt="${game.title}">
+                    <div class="game-card-content">
+                        <h3>${game.title}</h3>
+                        <span class="genre">${game.genre}</span>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>${game.rating}</span>
+                        </div>
+                        <div class="price">${game.price}</div>
+                        <div class="platforms">
+                            <i class="fab fa-windows" title="Windows"></i>
+                            <i class="fab fa-playstation" title="PlayStation"></i>
+                            <i class="fab fa-xbox" title="Xbox"></i>
+                        </div>
+                    </div>
+                `;
+                
+                gameCard.addEventListener('click', () => showGameDetails(game.id));
+                gamesGrid.appendChild(gameCard);
+            });
+        }
+
+        // Show Game Details
+        function showGameDetails(gameId) {
+            const game = games.find(g => g.id === gameId);
+            
+            if (game) {
+                document.getElementById('detail-title').textContent = game.title;
+                document.getElementById('detail-poster').src = game.poster;
+                document.getElementById('detail-rating').textContent = game.rating;
+                document.getElementById('detail-genre').textContent = game.genre;
+                document.getElementById('detail-release').textContent = game.release;
+                document.getElementById('detail-players').textContent = game.players;
+                document.getElementById('detail-description').textContent = game.description;
+                document.getElementById('detail-developer').textContent = game.developer;
+                document.getElementById('detail-publisher').textContent = game.publisher;
+                document.getElementById('detail-platforms').textContent = game.platforms;
+                document.getElementById('detail-requirements').textContent = game.requirements;
+                document.getElementById('detail-price').textContent = game.price;
+                
+                const screenshotsContainer = document.getElementById('detail-screenshots');
+                screenshotsContainer.innerHTML = '';
+                
+                game.screenshots.forEach(screenshot => {
+                    const img = document.createElement('img');
+                    img.src = screenshot;
+                    img.alt = `${game.title} Screenshot`;
+                    img.className = 'screenshot';
+                    screenshotsContainer.appendChild(img);
+                });
+                
+                homePage.style.display = 'none';
+                gameDetailsPage.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.dataset.page;
+                
+                if (page === 'home') {
+                    homePage.style.display = 'block';
+                    gameDetailsPage.style.display = 'none';
+                    window.scrollTo(0, 0);
+                } else if (page === 'games') {
+                    homePage.style.display = 'block';
+                    gameDetailsPage.style.display = 'none';
+                    document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Back Button
+        document.querySelector('.back-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            homePage.style.display = 'block';
+            gameDetailsPage.style.display = 'none';
+            window.scrollTo(0, 0);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render two sets of games for demo purposes
+            renderGames();
+            renderGames();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameGenius - Personalized Gaming Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649d1;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --gray: #636e72;
+            --border-radius: 12px;
+            --shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        header {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            right: 30px;
+            height: 3px;
+            background-color: #dfe6e9;
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #b2bec3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-align: center;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .step.active .step-label {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .quiz-section {
+            padding: 0 30px 30px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .quiz-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+        }
+
+        .option-card {
+            border: 2px solid #dfe6e9;
+            border-radius: var(--border-radius);
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .option-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background-color: rgba(108, 92, 231, 0.05);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .option-card i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .option-card .option-label {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .budget-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .budget-slider {
+            width: 100%;
+            margin: 20px 0;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: #dfe6e9;
+            outline: none;
+        }
+
+        .budget-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .budget-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .budget-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .budget-value {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn:disabled {
+            background-color: #b2bec3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: #57606f;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .results-section {
+            padding: 30px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .results-header p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .recommendation-category {
+            margin-bottom: 40px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f2f6;
+        }
+
+        .category-icon {
+            font-size: 1.8rem;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+
+        .category-header h3 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--success);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #f1f2f6;
+        }
+
+        .product-details {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .product-rating {
+            color: var(--warning);
+            font-size: 0.9rem;
+        }
+
+        .product-rating i {
+            margin-right: 3px;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        .restart-btn {
+            display: block;
+            margin: 40px auto 0;
+            background-color: var(--gray);
+        }
+
+        .restart-btn:hover {
+            background-color: #57606f;
+        }
+
+        /* Cart Modal Styles */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-modal.active {
+            display: flex;
+        }
+
+        .cart-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .cart-summary {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-total {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .checkout-btn:hover {
+            background-color: #00a884;
+        }
+
+        /* Confirmation Modal */
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirmation-modal.active {
+            display: flex;
+        }
+
+        .confirmation-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .confirmation-icon {
+            font-size: 3rem;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .confirmation-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .confirmation-message {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .continue-shopping {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .continue-shopping:hover {
+            background-color: var(--primary-dark);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stepper {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 25px;
+                padding: 0 20px;
+            }
+
+            .stepper::before {
+                display: none;
+            }
+
+            .step {
+                flex-direction: row;
+                gap: 15px;
+                align-items: center;
+                width: 100%;
+            }
+
+            .step-label {
+                text-align: left;
+            }
+
+            .quiz-section {
+                padding: 0 20px 20px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navigation-buttons {
+                flex-direction: column-reverse;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cart-item-image {
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> GameNexus</h1>
+            <p class="subtitle">Get personalized game and gear recommendations tailored just for you</p>
+        </header>
+
+        <div class="stepper">
+            <div class="step active" id="step-1">
+                <div class="step-number">1</div>
+                <div class="step-label">Platform</div>
+            </div>
+            <div class="step" id="step-2">
+                <div class="step-number">2</div>
+                <div class="step-label">Genres</div>
+            </div>
+            <div class="step" id="step-3">
+                <div class="step-number">3</div>
+                <div class="step-label">Preferences</div>
+            </div>
+            <div class="step" id="step-4">
+                <div class="step-number">4</div>
+                <div class="step-label">Budget</div>
+            </div>
+        </div>
+        
+        <!-- Quiz Sections -->
+        <div class="quiz-section active" id="quiz-section-1">
+            <div class="form-group">
+                <label>Which platform do you primarily game on?</label>
+                <div class="options-grid">
+                    <button class="option-card" data-value="pc" role="radio" aria-label="PC">
+                        <i class="fas fa-desktop"></i>
+                        <div class="option-label">PC</div>
+                    </button>
+                    <button class="option-card" data-value="ps5" role="radio" aria-label="PlayStation 5">
+                        <i class="fab fa-playstation"></i>
+                        <div class="option-label">PlayStation 5</div>
+                    </button>
+                    <button class="option-card" data-value="xbox-series-x" role="radio" aria-label="Xbox Series X">
+                        <i class="fab fa-xbox"></i>
+                        <div class="option-label">Xbox Series X</div>
+                    </button>
+                    <button class="option-card" data-value="nintendo-switch" role="radio" aria-label="Nintendo Switch">
+                        <i class="fas fa-gamepad"></i>
+                        <div class="option-label">Nintendo Switch</div>
+                    </button>
+                    <button class="option-card" data-value="mobile" role="radio" aria-label="Mobile">
+                        <i class="fas fa-mobile-alt"></i>
+                        <div class="option-label">Mobile</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn btn-secondary" disabled>
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn" id="next-1">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-section" id="quiz-section-2">
+            <div class="form-group">
+                <label>What game genres do you enjoy? (Select up to 3)</label>
+                <div class="options-grid">
+                    <button class="option-card" data-value="action" role="checkbox" aria-label="Action">
+                        <i class="fas fa-fist-raised"></i>
+                        <div class="option-label">Action</div>
+                    </button>
+                    <button class="option-card" data-value="adventure" role="checkbox" aria-label="Adventure">
+                        <i class="fas fa-mountain"></i>
+                        <div class="option-label">Adventure</div>
+                    </button>
+                    <button class="option-card" data-value="rpg" role="checkbox" aria-label="RPG">
+                        <i class="fas fa-dragon"></i>
+                        <div class="option-label">RPG</div>
+                    </button>
+                    <button class="option-card" data-value="fps" role="checkbox" aria-label="FPS">
+                        <i class="fas fa-crosshairs"></i>
+                        <div class="option-label">FPS</div>
+                    </button>
+                    <button class="option-card" data-value="strategy" role="checkbox" aria-label="Strategy">
+                        <i class="fas fa-chess"></i>
+                        <div class="option-label">Strategy</div>
+                    </button>
+                    <button class="option-card" data-value="sports" role="checkbox" aria-label="Sports">
+                        <i class="fas fa-running"></i>
+                        <div class="option-label">Sports</div>
+                    </button>
+                    <button class="option-card" data-value="racing" role="checkbox" aria-label="Racing">
+                        <i class="fas fa-car"></i>
+                        <div class="option-label">Racing</div>
+                    </button>
+                    <button class="option-card" data-value="horror" role="checkbox" aria-label="Horror">
+                        <i class="fas fa-ghost"></i>
+                        <div class="option-label">Horror</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn btn-secondary" id="back-2">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn" id="next-2">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-section" id="quiz-section-3">
+            <div class="form-group">
+                <label>What are you most interested in?</label>
+                <div class="options-grid">
+                    <button class="option-card" data-value="games" role="radio" aria-label="Games">
+                        <i class="fas fa-gamepad"></i>
+                        <div class="option-label">Games</div>
+                    </button>
+                    <button class="option-card" data-value="gear" role="radio" aria-label="Gaming Gear">
+                        <i class="fas fa-headset"></i>
+                        <div class="option-label">Gaming Gear</div>
+                    </button>
+                    <button class="option-card" data-value="both" role="radio" aria-label="Both Games and Gear">
+                        <i class="fas fa-robot"></i>
+                        <div class="option-label">Both</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>How would you describe your skill level?</label>
+                <div class="options-grid">
+                    <button class="option-card" data-value="casual" role="radio" aria-label="Casual Gamer">
+                        <i class="fas fa-user"></i>
+                        <div class="option-label">Casual</div>
+                    </button>
+                    <button class="option-card" data-value="intermediate" role="radio" aria-label="Intermediate Gamer">
+                        <i class="fas fa-user-ninja"></i>
+                        <div class="option-label">Intermediate</div>
+                    </button>
+                    <button class="option-card" data-value="hardcore" role="radio" aria-label="Hardcore Gamer">
+                        <i class="fas fa-user-graduate"></i>
+                        <div class="option-label">Hardcore</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn btn-secondary" id="back-3">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn" id="next-3">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-section" id="quiz-section-4">
+            <div class="form-group">
+                <label>What's your budget range?</label>
+                <div class="budget-container">
+                    <input type="range" min="0" max="4" value="2" class="budget-slider" id="budget-slider">
+                    <div class="budget-labels">
+                        <span>$</span>
+                        <span>$$</span>
+                        <span>$$$</span>
+                        <span>$$$$</span>
+                        <span>$$$$+</span>
+                    </div>
+                    <div class="budget-value" id="budget-value">$$ ($50-$100)</div>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn btn-secondary" id="back-4">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="btn" id="get-recommendations">
+                    <i class="fas fa-magic"></i> Get Recommendations
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-section" id="results-section">
+            <div class="results-header">
+                <h2>Your Personalized Recommendations</h2>
+                <p>Here are the perfect games and gear for your gaming style and preferences</p>
+            </div>
+            
+            <div class="recommendation-category" id="games-recommendations">
+                <div class="category-header">
+                    <i class="fas fa-gamepad category-icon"></i>
+                    <h3>Game Recommendations</h3>
+                </div>
+                <div class="products-grid" id="games-grid">
+                    <!-- Games will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="recommendation-category" id="gear-recommendations">
+                <div class="category-header">
+                    <i class="fas fa-headset category-icon"></i>
+                    <h3>Gear Recommendations</h3>
+                </div>
+                <div class="products-grid" id="gear-grid">
+                    <!-- Gear will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn" id="view-cart-btn">
+                    <i class="fas fa-shopping-cart"></i> View Cart
+                </button>
+                <button class="btn restart-btn" id="restart-btn">
+                    <i class="fas fa-redo"></i> Start Over
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2 class="cart-title">Your Shopping Cart</h2>
+                <button class="close-cart" id="close-cart">&times;</button>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <!-- Cart items will be inserted here by JavaScript -->
+            </div>
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="cart-subtotal">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax:</span>
+                    <span id="cart-tax">$0.00</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Total:</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <button class="checkout-btn" id="checkout-btn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal" id="confirmation-modal">
+        <div class="confirmation-content">
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="confirmation-title">Order Confirmed!</h2>
+            <p class="confirmation-message">Thank you for your purchase. Your order has been placed successfully.</p>
+            <button class="continue-shopping" id="continue-shopping">Continue Shopping</button>
+        </div>
+    </div>
+
+    <script>
+        // Comprehensive database of recommendations
+        const recommendationsDB = {
+            games: {
+                pc: {
+                    action: [
+                        { 
+                            id: "pc-action-1",
+                            name: "DOOM Eternal", 
+                            price: 39.99, 
+                            rating: 5,
+                            image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                            description: "The ultimate demon-slaying experience with brutal combat and incredible visuals.",
+                            tags: ["FPS", "Fast-paced", "Gore"]
+                        },
+                        { 
+                            id: "pc-action-2",
+                            name: "Devil May Cry 5", 
+                            price: 29.99, 
+                            rating: 4,
+                            image: "https://images.unsplash.com/photo-1633613286848-e6f43bbafb8d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                            description: "Stylish action combat with multiple playable characters and insane combos.",
+                            tags: ["Hack & Slash", "Stylish", "Character Action"]
+                        }
+                    ],
+                    adventure: [
+                        { 
+                            id: "pc-adventure-1",
+                            name: "The Witcher 3: Wild Hunt", 
+                            price: 39.99, 
+                            rating: 5,
+                            image: "https://images.unsplash.com/photo-1630431346172-42f1044459ee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                            description: "An epic open-world RPG with incredible storytelling and rich characters.",
+                            tags: ["Open World", "Fantasy", "Story-rich"]
+                        }
+                    ],
+                    rpg: [
+                        { 
+                            id: "pc-rpg-1",
+                            name: "Elden Ring", 
+                            price: 59.99, 
+                            rating: 5,
+                            image: "https://images.unsplash.com/photo-1648737963059-0e8a9aeba5b5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                            description: "A masterpiece of open-world design with challenging combat and deep lore.",
+                            tags: ["Souls-like", "Open World", "Challenging"]
+                        }
+                    ]
+                },
+                ps5: {
+                    action: [
+                        { 
+                            id: "ps5-action-1",
+                            name: "God of War: Ragnarök", 
+                            price: 69.99, 
+                            rating: 5,
+                            image: "https://images.unsplash.com/photo-1667816403373-8b6995a0e4a9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                            description: "Kratos and Atreus journey through Norse realms in this epic sequel.",
+                            tags: ["Story-driven", "Melee Combat", "Cinematic"]
+                        }
+                    ]
+                }
+            },
+            gear: {
+                pc: {
+                    casual: [
+                        { 
+                            id: "pc-gear-casual-1",
+                            name: "Redragon S101 Keyboard & Mouse Combo", 
+                            price: 49.99, 
+                            rating: 4,
+                            image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                            description: "Complete entry-level gaming set with backlit keyboard and precision mouse.",
+                            tags: ["Keyboard", "Mouse", "Combo"]
+                        }
+                    ],
+                    hardcore: [
+                        { 
+                            id: "pc-gear-hardcore-1",
+                            name: "Razer Huntsman Elite Keyboard", 
+                            price: 199.99, 
+                            rating: 5,
+                            image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80",
+                            description: "Optical switches for lightning-fast actuation with customizable RGB lighting.",
+                            tags: ["Mechanical", "RGB", "Premium"]
+                        }
+                    ]
+                },
+                ps5: {
+                    intermediate: [
+                        { 
+                            id: "ps5-gear-intermediate-1",
+                            name: "Pulse 3D Wireless Headset", 
+                            price: 99.99, 
+                            rating: 4,
+                            image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80",
+                            description: "Officially designed for PS5 with 3D audio support and dual noise-canceling mics.",
+                            tags: ["Wireless", "3D Audio", "Official"]
+                        }
+                    ]
+                }
+            }
+        };
+
+        // Budget ranges with min/max values
+        const budgetRanges = [
+            { label: "$ ($0-$50)", min: 0, max: 50 },
+            { label: "$$ ($50-$100)", min: 50, max: 100 },
+            { label: "$$$ ($100-$200)", min: 100, max: 200 },
+            { label: "$$$$ ($200-$400)", min: 200, max: 400 },
+            { label: "$$$$+ ($400+)", min: 400, max: 10000 }
+        ];
+
+        // User selections object
+        const userSelections = {
+            platform: null,
+            genres: [],
+            interest: null,
+            skillLevel: null,
+            budget: 2 // Default to middle budget
+        };
+
+        // Shopping cart
+        let shoppingCart = [];
+
+        // DOM elements
+        const quizSections = document.querySelectorAll('.quiz-section');
+        const steps = document.querySelectorAll('.step');
+        const optionCards = document.querySelectorAll('.option-card');
+        const budgetSlider = document.getElementById('budget-slider');
+        const budgetValue = document.getElementById('budget-value');
+        const resultsSection = document.getElementById('results-section');
+        const gamesGrid = document.getElementById('games-grid');
+        const gearGrid = document.getElementById('gear-grid');
+        const gamesRecSection = document.getElementById('games-recommendations');
+        const gearRecSection = document.getElementById('gear-recommendations');
+        const cartModal = document.getElementById('cart-modal');
+        const cartItems = document.getElementById('cart-items');
+        const cartSubtotal = document.getElementById('cart-subtotal');
+        const cartTax = document.getElementById('cart-tax');
+        const cartTotal = document.getElementById('cart-total');
+        const confirmationModal = document.getElementById('confirmation-modal');
+
+        // Navigation buttons
+        const next1Btn = document.getElementById('next-1');
+        const next2Btn = document.getElementById('next-2');
+        const next3Btn = document.getElementById('next-3');
+        const back2Btn = document.getElementById('back-2');
+        const back3Btn = document.getElementById('back-3');
+        const back4Btn = document.getElementById('back-4');
+        const getRecBtn = document.getElementById('get-recommendations');
+        const restartBtn = document.getElementById('restart-btn');
+        const viewCartBtn = document.getElementById('view-cart-btn');
+        const closeCartBtn = document.getElementById('close-cart');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const continueShoppingBtn = document.getElementById('continue-shopping');
+
+        // Initialize the app
+        function init() {
+            setupEventListeners();
+            updateBudgetDisplay();
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Option card selections
+            optionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    const questionType = this.closest('.quiz-section').id;
+                    
+                    // For genre selection (multiple)
+                    if (questionType === 'quiz-section-2') {
+                        const value = this.getAttribute('data-value');
+                        const index = userSelections.genres.indexOf(value);
+                        
+                        if (index === -1) {
+                            if (userSelections.genres.length < 3) {
+                                this.classList.add('selected');
+                                userSelections.genres.push(value);
+                            }
+                        } else {
+                            this.classList.remove('selected');
+                            userSelections.genres.splice(index, 1);
+                        }
+                    } 
+                    // For single selection questions
+                    else {
+                        const siblings = parent.querySelectorAll('.option-card');
+                        siblings.forEach(sib => sib.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        if (questionType === 'quiz-section-1') {
+                            userSelections.platform = this.getAttribute('data-value');
+                        } else if (questionType === 'quiz-section-3') {
+                            const question = this.closest('.form-group');
+                            if (question.querySelector('label').textContent === 'What are you most interested in?') {
+                                userSelections.interest = this.getAttribute('data-value');
+                            } else {
+                                userSelections.skillLevel = this.getAttribute('data-value');
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Budget slider
+            budgetSlider.addEventListener('input', function() {
+                userSelections.budget = parseInt(this.value);
+                updateBudgetDisplay();
+            });
+
+            // Navigation buttons
+            next1Btn.addEventListener('click', () => navigateTo(2));
+            next2Btn.addEventListener('click', () => navigateTo(3));
+            next3Btn.addEventListener('click', () => navigateTo(4));
+            back2Btn.addEventListener('click', () => navigateTo(1));
+            back3Btn.addEventListener('click', () => navigateTo(2));
+            back4Btn.addEventListener('click', () => navigateTo(3));
+            getRecBtn.addEventListener('click', showRecommendations);
+            restartBtn.addEventListener('click', restartQuiz);
+            viewCartBtn.addEventListener('click', showCart);
+            closeCartBtn.addEventListener('click', hideCart);
+            checkoutBtn.addEventListener('click', checkout);
+            continueShoppingBtn.addEventListener('click', continueShopping);
+        }
+
+        // Update budget display text
+        function updateBudgetDisplay() {
+            budgetValue.textContent = budgetRanges[userSelections.budget].label;
+        }
+
+        // Navigate between quiz sections
+        function navigateTo(step) {
+            // Validate before proceeding
+            if (step === 2 && !userSelections.platform) {
+                alert('Please select your gaming platform');
+                return;
+            }
+            
+            if (step === 3 && userSelections.genres.length === 0) {
+                alert('Please select at least one game genre');
+                return;
+            }
+            
+            if (step === 4 && (!userSelections.interest || !userSelections.skillLevel)) {
+                alert('Please answer all questions');
+                return;
+            }
+            
+            // Update UI
+            quizSections.forEach(section => section.classList.remove('active'));
+            document.getElementById(`quiz-section-${step}`).classList.add('active');
+            
+            steps.forEach((s, i) => {
+                s.classList.remove('active', 'completed');
+                if (i + 1 < step) s.classList.add('completed');
+                if (i + 1 === step) s.classList.add('active');
+            });
+        }
+
+        // Show recommendations based on user selections
+        function showRecommendations() {
+            // Hide quiz, show results
+            quizSections.forEach(section => section.classList.remove('active'));
+            resultsSection.classList.add('active');
+            steps.forEach(step => step.classList.add('completed'));
+            
+            // Clear previous results
+            gamesGrid.innerHTML = '';
+            gearGrid.innerHTML = '';
+            
+            // Get recommendations based on user selections
+            const platform = userSelections.platform;
+            const genres = userSelections.genres;
+            const interest = userSelections.interest;
+            const skillLevel = userSelections.skillLevel;
+            const budget = budgetRanges[userSelections.budget];
+            
+            // Show game recommendations if requested
+            if (interest === 'games' || interest === 'both') {
+                gamesRecSection.style.display = 'block';
+                
+                // Get game recommendations
+                let gameRecs = [];
+                genres.forEach(genre => {
+                    if (recommendationsDB.games[platform] && recommendationsDB.games[platform][genre]) {
+                        gameRecs = gameRecs.concat(recommendationsDB.games[platform][genre]);
+                    }
+                });
+                
+                // Filter by budget (simple example)
+                gameRecs = gameRecs.filter(game => {
+                    return game.price >= budget.min && game.price <= budget.max;
+                });
+                
+                // Display games (limit to 6)
+                gameRecs.slice(0, 6).forEach(game => {
+                    const gameCard = createProductCard(game);
+                    gamesGrid.appendChild(gameCard);
+                });
+            } else {
+                gamesRecSection.style.display = 'none';
+            }
+            
+            if (interest === 'gear' || interest === 'both') {
+                gearRecSection.style.display = 'block';
+                
+                // Get gear recommendations
+                if (recommendationsDB.gear[platform] && recommendationsDB.gear[platform][skillLevel]) {
+                    const gearRecs = recommendationsDB.gear[platform][skillLevel];
+                    
+                    // Display gear (limit to 6)
+                    gearRecs.slice(0, 6).forEach(gear => {
+                        const gearCard = createProductCard(gear);
+                        gearGrid.appendChild(gearCard);
+                    });
+                }
+            } else {
+                gearRecSection.style.display = 'none';
+            }
+        }
+
+        // Create product card element
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-badge">Recommended</div>
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <div class="product-details">
+                    <h3 class="product-title">${product.name}</h3>
+                    <p class="product-description">${product.description}</p>
+                    <div class="product-footer">
+                        <div class="product-price">$${product.price.toFixed(2)}</div>
+                        <div class="product-rating">
+                            ${'<i class="fas fa-star"></i>'.repeat(Math.floor(product.rating))}
+                            ${product.rating % 1 ? '<i class="fas fa-star-half-alt"></i>' : ''}
+                        </div>
+                    </div>
+                    <button class="btn add-to-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-image="${product.image}">Add to Cart</button>
+                </div>
+            `;
+            
+            // Add event listener to the Add to Cart button
+            const addToCartBtn = card.querySelector('.add-to-cart');
+            addToCartBtn.addEventListener('click', () => addToCart(product));
+            
+            return card;
+        }
+
+        // Add item to cart
+        function addToCart(product) {
+            // Check if item already exists in cart
+            const existingItem = shoppingCart.find(item => item.id === product.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                shoppingCart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1
+                });
+            }
+            
+            // Show confirmation
+            alert(`${product.name} has been added to your cart!`);
+            
+            // Update cart display
+            updateCart();
+        }
+
+        // Show cart modal
+        function showCart() {
+            updateCart();
+            cartModal.classList.add('active');
+        }
+
+        // Hide cart modal
+        function hideCart() {
+            cartModal.classList.remove('active');
+        }
+
+        // Update cart display
+        function updateCart() {
+            // Clear current cart items
+            cartItems.innerHTML = '';
+            
+            // Add each item to cart
+            shoppingCart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">$${(item.price * item.quantity).toFixed(2)} (${item.quantity}x)</div>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">&times;</button>
+                `;
+                
+                // Add event listener to remove button
+                const removeBtn = cartItem.querySelector('.remove-item');
+                removeBtn.addEventListener('click', () => removeFromCart(item.id));
+                
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Calculate totals
+            const subtotal = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.1; // 10% tax
+            const total = subtotal + tax;
+            
+            // Update totals display
+            cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            cartTax.textContent = `$${tax.toFixed(2)}`;
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Remove item from cart
+        function removeFromCart(id) {
+            shoppingCart = shoppingCart.filter(item => item.id !== id);
+            updateCart();
+        }
+
+        // Checkout process
+        function checkout() {
+            if (shoppingCart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            // Hide cart modal
+            hideCart();
+            
+            // Show confirmation modal
+            confirmationModal.classList.add('active');
+            
+            // Clear cart
+            shoppingCart = [];
+            updateCart();
+        }
+
+        // Continue shopping after checkout
+        function continueShopping() {
+            confirmationModal.classList.remove('active');
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            // Reset selections
+            userSelections.platform = null;
+            userSelections.genres = [];
+            userSelections.interest = null;
+            userSelections.skillLevel = null;
+            userSelections.budget = 2;
+            
+            // Reset UI
+            optionCards.forEach(card => card.classList.remove('selected'));
+            budgetSlider.value = 2;
+            budgetValue.textContent = budgetRanges[2].label;
+            
+            // Show first step
+            quizSections.forEach(section => section.classList.remove('active'));
+            document.getElementById('quiz-section-1').classList.add('active');
+            
+            steps.forEach((step, i) => {
+                step.classList.remove('active', 'completed');
+                if (i === 0) step.classList.add('active');
+            });
+            
+            resultsSection.classList.remove('active');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

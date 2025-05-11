@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RETURN OF THE CARS| Game Catalog</title>
+    <style>
+        /* CSS Styles - Consistent with catalog page */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #ff5555;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .back-button:hover {
+            color: var(--primary-color);
+        }
+
+        .back-button i {
+            margin-right: 5px;
+        }
+
+        .game-details-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .game-header {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .game-header {
+                flex-direction: row;
+            }
+        }
+
+        .game-media {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .game-main-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .game-thumbnails {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .game-thumbnail {
+            width: 80px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .game-thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .game-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .game-info {
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .game-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .game-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .game-rating {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+
+        .game-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .game-platforms {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .platform-tag {
+            padding: 4px 10px;
+            background-color: var(--light-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .game-genres {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .genre-tag {
+            padding: 4px 10px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .buy-button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .buy-button:hover {
+            background-color: #27ae60;
+        }
+
+        .game-description {
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--light-color);
+        }
+
+        .system-requirements {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .requirement-group {
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .requirement-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .requirement-list {
+            list-style-type: none;
+        }
+
+        .requirement-list li {
+            margin-bottom: 8px;
+            display: flex;
+        }
+
+        .requirement-list li::before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .reviews-section {
+            margin-top: 30px;
+        }
+
+        .review-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .review-date {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .review-rating {
+            color: #f1c40f;
+            margin-bottom: 10px;
+        }
+
+        .review-text {
+            line-height: 1.6;
+        }
+
+        .add-review {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .submit-review {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            align-self: flex-start;
+        }
+
+        .submit-review:hover {
+            background-color: #cc4444;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .rating-stars input {
+            display: none;
+        }
+
+        .rating-stars label {
+            font-size: 1.5rem;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .rating-stars input:checked ~ label {
+            color: #ddd;
+        }
+
+        .rating-stars label:hover,
+        .rating-stars label:hover ~ label,
+        .rating-stars input:checked + label,
+        .rating-stars input:checked ~ label {
+            color: #f1c40f;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <a href="game-catalog.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Catalog
+        </a>
+
+        <div class="game-details-container">
+            <div class="game-header">
+                <div class="game-media">
+                    <img src="https://th.bing.com/th/id/OIP.H0nGYw_zbY1vvIXO3SvK3AHaEJ?w=626&h=351&rs=1&pid=ImgDetMain" class="game-main-image" id="main-image">
+                    <div class="game-thumbnails">
+                        <img src="https://th.bing.com/th/id/OIP.H0nGYw_zbY1vvIXO3SvK3AHaEJ?w=626&h=351&rs=1&pid=ImgDetMain" alt="Cyberpunk 2077 Screenshot 1" class="game-thumbnail" onclick="changeMainImage(this.src)">
+                        <img src="https://th.bing.com/th/id/OIP.H0nGYw_zbY1vvIXO3SvK3AHaEJ?w=626&h=351&rs=1&pid=ImgDetMain" alt="Cyberpunk 2077 Screenshot 2" class="game-thumbnail" onclick="changeMainImage(this.src)">
+                        <img src="https://th.bing.com/th/id/OIP.H0nGYw_zbY1vvIXO3SvK3AHaEJ?w=626&h=351&rs=1&pid=ImgDetMain" alt="Cyberpunk 2077 Screenshot 3" class="game-thumbnail" onclick="changeMainImage(this.src)">
+                        <img src="https://th.bing.com/th/id/OIP.H0nGYw_zbY1vvIXO3SvK3AHaEJ?w=626&h=351&rs=1&pid=ImgDetMain" alt="Cyberpunk 2077 Screenshot 4" class="game-thumbnail" onclick="changeMainImage(this.src)">
+                    </div>
+                    <iframe class="game-video" src="https://www.youtube.com/watch?v=ZXTD2rPNoL0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="game-info">
+                    <h1 class="game-title">RETURN OF THE CARS</h1>
+                    <div class="game-meta">
+                        <div class="game-rating">★★★★☆ (4.2/5)</div>
+                        <div class="game-price">$49.99</div>
+                    </div>
+                    <div class="game-platforms">
+                        <span class="platform-tag">PC</span>
+                        <span class="platform-tag">PlayStation 5</span>
+                        <span class="platform-tag">Xbox Series X/S</span>
+                        <span class="platform-tag">PlayStation 4</span>
+                        <span class="platform-tag">Xbox One</span>
+                    </div>
+                    <div class="game-genres">
+                        <span class="genre-tag">RPG</span>
+                        <span class="genre-tag">Open World</span>
+                        <span class="genre-tag">FPS</span>
+                        <span class="genre-tag">RETURN OF THE CARS</span>
+                    </div>
+                    <div>
+                    <button class="buy-button">Add to Cart</button></div>
+                    
+                    <div class="game-description">
+                        <p>RETURN OF THE CARS is an open-world, action-adventure story set in Night City, a megalopolis obsessed with power, glamour and body modification. You play as V, a mercenary outlaw going after a one-of-a-kind implant that is the key to immortality.</p>
+                        <p>Customize your character's cyberware, skillset and playstyle, and explore a vast city where the choices you make shape the story and the world around you. With the Phantom Liberty expansion, experience an all-new adventure in the dangerous district of Dogtown.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="system-requirements">
+                <div class="requirement-group">
+                    <h3 class="requirement-title">Minimum Requirements (PC)</h3>
+                    <ul class="requirement-list">
+                        <li><strong>OS: </strong>  Windows 10 64-bit</li>
+                        <li><strong>Processor: </strong>  Intel Core i5-3570K</li>
+                        <li><strong>Memory: </strong>  8 GB RAM</li>
+                        <li><strong>Graphics: </strong>  NVIDIA GTX 780 3GB</li>
+                        <li><strong>Storage: </strong>  70 GB available space </li>
+                    </ul>
+                </div>
+                <div class="requirement-group">
+                    <h3 class="requirement-title">Recommended Requirements (PC)</h3>
+                    <ul class="requirement-list">
+                        <li><strong>OS:</strong> Windows 10/11 64-bit</li>
+                        <li><strong>Processor:</strong> Intel Core i7-4790 or AMD Ryzen 3 3200G</li>
+                        <li><strong>Memory:</strong> 12 GB RAM</li>
+                        <li><strong>Graphics:</strong> NVIDIA GTX 1060 6GB or AMD Radeon RX 590</li>
+                        <li><strong>Storage:</strong> 70 GB available space (SSD recommended)</li>
+                    </ul>
+                </div>
+                <div class="requirement-group">
+                    <h3 class="requirement-title">Ray Tracing Requirements (PC)</h3>
+                    <ul class="requirement-list">
+                        <li><strong>OS:</strong> Windows 10/11 64-bit</li>
+                        <li><strong>Processor:</strong> Intel Core i7-6700 or AMD Ryzen 5 3600</li>
+                        <li><strong>Memory:</strong> 16 GB RAM</li>
+                        <li><strong>Graphics:</strong> NVIDIA RTX 2060 or AMD RX 6800 XT</li>
+                        <li><strong>Storage:</strong> 70 GB available space (SSD recommended)</li>
+                    </ul>
+                </div>
+                <div class="requirement-group">
+                    <h3 class="requirement-title">PlayStation 5 / Xbox Series X</h3>
+                    <ul class="requirement-list">
+                        <li><strong>Resolution:</strong> Up to 4K</li>
+                        <li><strong>Frame Rate:</strong> Up to 60 FPS</li>
+                        <li><strong>Storage:</strong> 70 GB available space</li>
+                        <li><strong>Features:</strong> Ray Tracing, Faster Loading</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="reviews-section">
+                <h2 class="section-title">Player Reviews</h2>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="review-author">NetRunner99</span>
+                        <span class="review-date">January 15, 2023</span>
+                    </div>
+                    <div class="review-rating">★★★★★</div>
+                    <div class="review-text">
+                        <p>After all the updates and the Phantom Liberty expansion, RETURN OF THE CARS has become the game it was meant to be. Night City is breathtaking, the story is engaging, and the gameplay is smooth. The attention to detail is incredible, especially with ray tracing enabled.</p>
+                    </div>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="review-author">JohnnySilverhand</span>
+                        <span class="review-date">December 5, 2022</span>
+                    </div>
+                    <div class="review-rating">★★★★☆</div>
+                    <div class="review-text">
+                        <p>The 2.0 update completely transformed the game. The new skill trees and police system make it feel like a different experience. Keanu Reeves as Johnny is perfect casting. Still some minor bugs, but nothing game-breaking like at launch.</p>
+                    </div>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="review-author">Choomba</span>
+                        <span class="review-date">November 28, 2022</span>
+                    </div>
+                    <div class="review-rating">★★★☆☆</div>
+                    <div class="review-text">
+                        <p>Great atmosphere and story, but the AI is still not great. Driving feels floaty and the world, while beautiful, doesn't feel as alive as it should. Worth playing for the main story and side quests, but don't expect GTA-level interactivity.</p>
+                    </div>
+                </div>
+
+                <div class="add-review">
+                    <h3 class="section-title">Add Your Review</h3>
+                    <form class="review-form" id="review-form">
+                        <div class="form-group">
+                            <label for="review-name">Name</label>
+                            <input type="text" id="review-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rating</label>
+                            <div class="rating-stars">
+                                <input type="radio" id="star5" name="rating" value="5">
+                                <label for="star5">★</label>
+                                <input type="radio" id="star4" name="rating" value="4">
+                                <label for="star4">★</label>
+                                <input type="radio" id="star3" name="rating" value="3">
+                                <label for="star3">★</label>
+                                <input type="radio" id="star2" name="rating" value="2">
+                                <label for="star2">★</label>
+                                <input type="radio" id="star1" name="rating" value="1">
+                                <label for="star1">★</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="review-text">Your Review</label>
+                            <textarea id="review-text" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-review">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Change main image when thumbnail is clicked
+        function changeMainImage(src) {
+            document.getElementById('main-image').src = src;
+        }
+
+        // Handle review form submission
+        document.getElementById('review-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('review-name').value;
+            const rating = document.querySelector('input[name="rating"]:checked').value;
+            const text = document.getElementById('review-text').value;
+            const date = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Create new review element
+            const reviewCard = document.createElement('div');
+            reviewCard.className = 'review-card';
+            reviewCard.innerHTML = `
+                <div class="review-header">
+                    <span class="review-author">${name}</span>
+                    <span class="review-date">${date}</span>
+                </div>
+                <div class="review-rating">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</div>
+                <div class="review-text">
+                    <p>${text}</p>
+                </div>
+            `;
+            
+            // Insert new review at the top of reviews section
+            const reviewsSection = document.querySelector('.reviews-section');
+            reviewsSection.insertBefore(reviewCard, reviewsSection.children[1]);
+            
+            // Reset form
+            this.reset();
+            
+            // Show success message (you could add a proper notification here)
+            alert('Thank you for your review!');
+        });
+    </script>
+</body>
+</html>

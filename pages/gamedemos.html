@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Adventure - Try Before You Buy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #00cec9;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --space-blue: #0f1c3f;
+            --space-purple: #6a1b9a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--space-blue);
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .cart-icon {
+            position: relative;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .game-demo-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .game-info {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--space-purple);
+        }
+
+        .game-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--warning);
+        }
+
+        .game-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .game-rating {
+            color: var(--warning);
+        }
+
+        .game-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .game-description {
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .game-features {
+            margin-bottom: 20px;
+        }
+
+        .game-features h3 {
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .game-features ul {
+            list-style-type: none;
+        }
+
+        .game-features li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .game-features li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--success);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: white;
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(108, 92, 231, 0.2);
+        }
+
+        .game-play-area {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--space-purple);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-screen {
+            width: 100%;
+            height: 400px;
+            background-color: #000;
+            border: 2px solid var(--space-purple);
+            border-radius: 5px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .time-remaining {
+            font-size: 1.2rem;
+            color: var(--warning);
+        }
+
+        .demo-notice {
+            background-color: rgba(253, 203, 110, 0.2);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid var(--warning);
+            margin-bottom: 20px;
+        }
+
+        .demo-notice h3 {
+            color: var(--warning);
+            margin-bottom: 5px;
+        }
+
+        /* Cart Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--space-blue);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            border: 1px solid var(--space-purple);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--warning);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .cart-item-name {
+            font-weight: 500;
+        }
+
+        .cart-item-price {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .cart-total-amount {
+            color: var(--success);
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        /* Confirmation Page */
+        .confirmation-page {
+            display: none;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 50px auto;
+            max-width: 600px;
+            border: 1px solid var(--space-purple);
+        }
+
+        .confirmation-page.active {
+            display: block;
+        }
+
+        .confirmation-icon {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .confirmation-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--warning);
+        }
+
+        .confirmation-message {
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+
+        .order-details {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .order-details h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .order-label {
+            color: var(--secondary);
+        }
+
+        .back-to-game {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-game:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Game Elements */
+        .player {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .enemy {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            top: -40px;
+        }
+
+        .bullet {
+            position: absolute;
+            width: 5px;
+            height: 15px;
+            background-color: var(--warning);
+            border-radius: 5px;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-demo-container {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Game Demo Page -->
+        <div id="game-demo-page">
+            <header>
+                <div class="logo">
+                    <i class="fas fa-gamepad"></i>
+                    <span>GameNexus</span>
+                </div>
+                <div class="cart-icon" id="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="cart-count">0</span>
+                </div>
+            </header>
+
+            <div class="game-demo-container">
+                <div class="game-info">
+                    <h1 class="game-title">Space Adventure</h1>
+                    <div class="game-meta">
+                        <div class="game-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            4.5
+                        </div>
+                        <div class="game-genre">
+                            <i class="fas fa-tag"></i> Action, Shooter
+                        </div>
+                    </div>
+                    <div class="game-price">$29.99</div>
+                    <div class="game-description">
+                        Space Adventure is an action-packed shooter set in a distant galaxy. 
+                        Battle against alien forces, upgrade your spaceship, and save the universe 
+                        from impending doom. Experience epic space battles and explore mysterious planets.
+                    </div>
+                    <div class="game-features">
+                        <h3>Key Features:</h3>
+                        <ul>
+                            <li>Engaging single-player campaign with 50+ missions</li>
+                            <li>10 unique spaceships with customizable weapons</li>
+                            <li>Online multiplayer battles with leaderboards</li>
+                            <li>Stunning 3D graphics and visual effects</li>
+                            <li>Original soundtrack and immersive sound design</li>
+                        </ul>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="add-to-cart">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-heart"></i> Wishlist
+                        </button>
+                    </div>
+                </div>
+
+                <div class="game-play-area">
+                    <div class="demo-notice">
+                        <h3>DEMO VERSION</h3>
+                        <p>This is a limited demo version of the game. Purchase the full version to unlock all features and levels.</p>
+                    </div>
+                    <div class="game-screen" id="game-screen">
+                        <canvas id="game-canvas"></canvas>
+                        <div class="score-display" id="score-display">Score: 0</div>
+                    </div>
+                    <div class="game-controls">
+                        <div class="time-remaining" id="time-remaining">Demo Time: 02:00</div>
+                        <button class="btn btn-outline" id="restart-demo">
+                            <i class="fas fa-redo"></i> Restart Demo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Modal -->
+        <div class="modal" id="cart-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Your Shopping Cart</h3>
+                    <button class="close-modal" id="close-cart">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="cart-items" id="cart-items">
+                        <!-- Cart items will be added here dynamically -->
+                        <div class="empty-cart">Your cart is empty</div>
+                    </div>
+                    <div class="cart-total">
+                        <span>Total:</span>
+                        <span class="cart-total-amount" id="cart-total">$0.00</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" id="continue-shopping">
+                        Continue Shopping
+                    </button>
+                    <button class="btn btn-primary" id="checkout">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Confirmation Page -->
+        <div class="confirmation-page" id="confirmation-page">
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="confirmation-title">Order Confirmed!</h2>
+            <p class="confirmation-message">
+                Thank you for your purchase! Your order has been received and will be processed shortly. 
+                You will receive a confirmation email with your order details.
+            </p>
+            <div class="order-details">
+                <h3>Order Details</h3>
+                <div class="order-row">
+                    <span class="order-label">Order Number:</span>
+                    <span id="order-number">GN-2023-001</span>
+                </div>
+                <div class="order-row">
+                    <span class="order-label">Date:</span>
+                    <span id="order-date">June 15, 2023</span>
+                </div>
+                <div class="order-row">
+                    <span class="order-label">Total:</span>
+                    <span id="order-total">$29.99</span>
+                </div>
+                <div class="order-row">
+                    <span class="order-label">Payment Method:</span>
+                    <span id="payment-method">Credit Card</span>
+                </div>
+            </div>
+            <a href="#" class="back-to-game" id="back-to-game">
+                <i class="fas fa-arrow-left"></i> Back to Game
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Game Demo Variables
+        let demoTime = 120; // 2 minutes in seconds
+        let score = 0;
+        let gameInterval;
+        let isGameRunning = false;
+        let canvas, ctx;
+        let player = {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 50,
+            speed: 5
+        };
+        let bullets = [];
+        let enemies = [];
+        let keys = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            Space: false
+        };
+
+        // Cart Variables
+        let cart = [];
+        const gameItem = {
+            id: 1,
+            name: "Space Adventure",
+            price: 29.99,
+            image: "https://via.placeholder.com/60"
+        };
+
+        // DOM Elements
+        const gameDemoPage = document.getElementById('game-demo-page');
+        const cartModal = document.getElementById('cart-modal');
+        const confirmationPage = document.getElementById('confirmation-page');
+        const cartIcon = document.getElementById('cart-icon');
+        const cartCount = document.getElementById('cart-count');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        const closeCartBtn = document.getElementById('close-cart');
+        const continueShoppingBtn = document.getElementById('continue-shopping');
+        const checkoutBtn = document.getElementById('checkout');
+        const addToCartBtn = document.getElementById('add-to-cart');
+        const backToGameBtn = document.getElementById('back-to-game');
+        const timeRemainingDisplay = document.getElementById('time-remaining');
+        const scoreDisplay = document.getElementById('score-display');
+        const restartDemoBtn = document.getElementById('restart-demo');
+        const gameScreen = document.getElementById('game-screen');
+
+        // Initialize Game
+        function initGame() {
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas dimensions
+            canvas.width = gameScreen.offsetWidth;
+            canvas.height = gameScreen.offsetHeight;
+            
+            // Set player initial position
+            player.x = canvas.width / 2 - player.width / 2;
+            player.y = canvas.height - player.height - 20;
+            
+            // Start game loop
+            if (!isGameRunning) {
+                isGameRunning = true;
+                gameInterval = setInterval(gameLoop, 20);
+                startDemoTimer();
+            }
+            
+            // Clear any existing enemies and bullets
+            enemies = [];
+            bullets = [];
+            score = 0;
+            updateScore();
+        }
+
+        // Game Loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw player
+            ctx.fillStyle = '#00cec9';
+            ctx.beginPath();
+            ctx.arc(player.x + player.width/2, player.y + player.height/2, player.width/2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Move player
+            if (keys.ArrowLeft && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys.ArrowRight && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            }
+            
+            // Handle bullets
+            for (let i = 0; i < bullets.length; i++) {
+                bullets[i].y -= 8;
+                ctx.fillStyle = '#fdcb6e';
+                ctx.fillRect(bullets[i].x, bullets[i].y, bullets[i].width, bullets[i].height);
+                
+                // Remove bullets that go off screen
+                if (bullets[i].y < 0) {
+                    bullets.splice(i, 1);
+                    i--;
+                }
+            }
+            
+            // Spawn enemies randomly
+            if (Math.random() < 0.02) {
+                spawnEnemy();
+            }
+            
+            // Handle enemies
+            for (let i = 0; i < enemies.length; i++) {
+                enemies[i].y += 3;
+                ctx.fillStyle = '#d63031';
+                ctx.beginPath();
+                ctx.arc(enemies[i].x + enemies[i].width/2, enemies[i].y + enemies[i].height/2, enemies[i].width/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Check for collision with player
+                if (checkCollision(
+                    {x: player.x, y: player.y, width: player.width, height: player.height},
+                    enemies[i]
+                )) {
+                    // Game over
+                    clearInterval(gameInterval);
+                    isGameRunning = false;
+                    alert('Game Over! Your score: ' + score);
+                    initGame();
+                    return;
+                }
+                
+                // Check for collision with bullets
+                for (let j = 0; j < bullets.length; j++) {
+                    if (checkCollision(bullets[j], enemies[i])) {
+                        // Remove enemy and bullet
+                        enemies.splice(i, 1);
+                        bullets.splice(j, 1);
+                        score += 10;
+                        updateScore();
+                        i--;
+                        break;
+                    }
+                }
+                
+                // Remove enemies that go off screen
+                if (enemies[i].y > canvas.height) {
+                    enemies.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        // Spawn Enemy
+        function spawnEnemy() {
+            const enemy = {
+                x: Math.random() * (canvas.width - 40),
+                y: -40,
+                width: 40,
+                height: 40
+            };
+            enemies.push(enemy);
+        }
+
+        // Check Collision
+        function checkCollision(obj1, obj2) {
+            return obj1.x < obj2.x + obj2.width &&
+                   obj1.x + obj1.width > obj2.x &&
+                   obj1.y < obj2.y + obj2.height &&
+                   obj1.y + obj1.height > obj2.y;
+        }
+
+        // Start Demo Timer
+        function startDemoTimer() {
+            demoTime = 120; // Reset to 2 minutes
+            updateTimerDisplay();
+            
+            const timer = setInterval(() => {
+                demoTime--;
+                updateTimerDisplay();
+                
+                if (demoTime <= 0) {
+                    clearInterval(timer);
+                    clearInterval(gameInterval);
+                    isGameRunning = false;
+                    alert('Demo time expired! Your score: ' + score);
+                }
+            }, 1000);
+        }
+
+        // Update Timer Display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(demoTime / 60);
+            const seconds = demoTime % 60;
+            timeRemainingDisplay.textContent = `Demo Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Update Score Display
+        function updateScore() {
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+
+        // Event Listeners for Game Controls
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+                keys[e.code] = true;
+                
+                if (e.code === 'Space' && isGameRunning) {
+                    // Shoot bullet
+                    bullets.push({
+                        x: player.x + player.width/2 - 2.5,
+                        y: player.y,
+                        width: 5,
+                        height: 15
+                    });
+                }
+                
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (['ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+                keys[e.code] = false;
+                e.preventDefault();
+            }
+        });
+
+        restartDemoBtn.addEventListener('click', () => {
+            if (isGameRunning) {
+                clearInterval(gameInterval);
+            }
+            initGame();
+        });
+
+        // Cart Functions
+        function addToCart() {
+            cart.push(gameItem);
+            updateCart();
+            showCartNotification(`${gameItem.name} added to cart!`);
+        }
+
+        function updateCart() {
+            cartCount.textContent = cart.length;
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<div class="empty-cart">Your cart is empty</div>';
+                cartTotal.textContent = '$0.00';
+                return;
+            }
+            
+            // Calculate total
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+            
+            // Update cart items
+            cartItemsContainer.innerHTML = '';
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <div>
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <button class="remove-item" data-id="${item.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+            });
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    removeFromCart(itemId);
+                });
+            });
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCart();
+        }
+
+        function showCartNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification';
+            notification.textContent = message;
+            
+            // Style the notification
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = '#00b894';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            notification.style.zIndex = '1000';
+            notification.style.animation = 'fadeIn 0.3s';
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        function showConfirmation() {
+            gameDemoPage.style.display = 'none';
+            confirmationPage.classList.add('active');
+            
+            // Update order details
+            document.getElementById('order-number').textContent = `GN-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            document.getElementById('order-date').textContent = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('order-total').textContent = `$${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}`;
+        }
+
+        // Event Listeners for Cart
+        cartIcon.addEventListener('click', () => {
+            cartModal.classList.add('active');
+        });
+
+        closeCartBtn.addEventListener('click', () => {
+            cartModal.classList.remove('active');
+        });
+
+        continueShoppingBtn.addEventListener('click', () => {
+            cartModal.classList.remove('active');
+        });
+
+        addToCartBtn.addEventListener('click', addToCart);
+
+        checkoutBtn.addEventListener('click', () => {
+            cartModal.classList.remove('active');
+            showConfirmation();
+        });
+
+        backToGameBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            confirmationPage.classList.remove('active');
+            gameDemoPage.style.display = 'block';
+            cart = []; // Clear cart after purchase
+            updateCart();
+        });
+
+        // Initialize the game when page loads
+        window.addEventListener('load', initGame);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (canvas) {
+                canvas.width = gameScreen.offsetWidth;
+                canvas.height = gameScreen.offsetHeight;
+            }
+        });
+    </script>
+</body>
+</html>

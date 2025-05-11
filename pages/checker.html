@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Compatibility Checker</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --dark-color: #2d3436;
+            --light-color: #f5f6fa;
+            --success-color: #00b894;
+            --warning-color: #fdcb6e;
+            --error-color: #d63031;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .compatibility-checker {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .compatibility-checker::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #636e72;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .checker-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-section, .results-section {
+            background-color: var(--light-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .check-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .check-button:hover {
+            background-color: #5649d1;
+        }
+
+        .check-button:disabled {
+            background-color: #b2b2b2;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .compatibility-score {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        .result-value {
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .recommendations {
+            margin-top: 30px;
+        }
+
+        .recommendations h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .product-card h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .product-card .price {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .compatibility-checker {
+                padding: 20px;
+            }
+            
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .full-width {
+                grid-column: span 1;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-section {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="compatibility-checker">
+        <h1><span class="game-icon">🎮</span> Game Compatibility Checker</h1>
+        <p class="subtitle">Check if your hardware works with specific games or consoles</p>
+        
+        <div class="checker-container">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="device-type">What are you checking?</label>
+                    <select id="device-type" class="form-control">
+                        <option value="">Select device type</option>
+                        <option value="accessory">Gaming Accessory</option>
+                        <option value="hardware">PC Hardware</option>
+                        <option value="game">Game Compatibility</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="accessory-group">
+                    <label for="accessory-type">Accessory Type</label>
+                    <select id="accessory-type" class="form-control" disabled>
+                        <option value="">Select accessory</option>
+                        <option value="controller">Controller</option>
+                        <option value="headset">Headset</option>
+                        <option value="keyboard">Keyboard</option>
+                        <option value="mouse">Mouse</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="hardware-group">
+                    <label for="hardware-type">Hardware Type</label>
+                    <select id="hardware-type" class="form-control" disabled>
+                        <option value="">Select hardware</option>
+                        <option value="gpu">Graphics Card (GPU)</option>
+                        <option value="cpu">Processor (CPU)</option>
+                        <option value="ram">Memory (RAM)</option>
+                        <option value="storage">Storage</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="game-group">
+                    <label for="game-name">Game Title</label>
+                    <input type="text" id="game-name" class="form-control" placeholder="e.g. Cyberpunk 2077" disabled>
+                </div>
+
+                <div class="form-group" id="platform-group">
+                    <label for="platform">Platform</label>
+                    <select id="platform" class="form-control" disabled>
+                        <option value="">Select platform</option>
+                        <option value="pc">PC</option>
+                        <option value="ps5">PlayStation 5</option>
+                        <option value="xbox-series-x">Xbox Series X</option>
+                        <option value="nintendo-switch">Nintendo Switch</option>
+                    </select>
+                </div>
+
+                <button id="check-btn" class="check-button" disabled>Check Compatibility</button>
+            </div>
+
+            <div class="results-section hidden" id="results-section">
+                <div class="result-header">
+                    <h2>Compatibility Results</h2>
+                    <div class="compatibility-score">
+                        <span id="score-value">0</span>% Match
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    <div class="result-item">
+                        <span class="result-label">Device:</span>
+                        <span id="result-device" class="result-value">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Platform:</span>
+                        <span id="result-platform" class="result-value">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Status:</span>
+                        <span id="result-status" class="result-value">-</span>
+                    </div>
+                    <div class="result-item full-width">
+                        <span class="result-label">Details:</span>
+                        <span id="result-details" class="result-value">-</span>
+                    </div>
+                </div>
+
+                <div class="recommendations hidden" id="recommendations">
+                    <h3>Recommended Products</h3>
+                    <div class="products-grid" id="products-grid">
+                        <!-- Products will be inserted here by JavaScript -->
+                    </div>
+                </div>
+
+                <button id="new-check-btn" class="check-button">Perform New Check</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample database of compatibility information
+        const compatibilityDB = {
+            // Accessories compatibility
+            accessories: {
+                controller: {
+                    'pc': { compatible: true, score: 90, details: 'Works with most PC games via USB or Bluetooth. Some games may require additional software.' },
+                    'ps5': { compatible: true, score: 100, details: 'Fully compatible with PlayStation 5. All features supported.' },
+                    'xbox-series-x': { compatible: true, score: 100, details: 'Fully compatible with Xbox Series X. Best performance guaranteed.' },
+                    'nintendo-switch': { compatible: false, score: 30, details: 'Limited compatibility. Only works with certain Switch games.' }
+                },
+                headset: {
+                    'pc': { compatible: true, score: 95, details: 'Works with all PC configurations. May need drivers for advanced features.' },
+                    'ps5': { compatible: true, score: 85, details: 'Works with PS5 but some features like 3D audio might be limited.' },
+                    'xbox-series-x': { compatible: true, score: 80, details: 'Compatible but may require adapter for full functionality.' },
+                    'nintendo-switch': { compatible: true, score: 70, details: 'Works with Switch in handheld mode. Dock mode may require USB adapter.' }
+                },
+                keyboard: {
+                    'pc': { compatible: true, score: 100, details: 'Fully compatible with all PC systems.' },
+                    'ps5': { compatible: true, score: 60, details: 'Works for text input but not for gaming on PS5.' },
+                    'xbox-series-x': { compatible: false, score: 20, details: 'Not supported for gaming on Xbox consoles.' },
+                    'nintendo-switch': { compatible: false, score: 10, details: 'Not compatible with Nintendo Switch.' }
+                },
+                mouse: {
+                    'pc': { compatible: true, score: 100, details: 'Fully compatible with all PC systems.' },
+                    'ps5': { compatible: false, score: 5, details: 'Not supported for gaming on PS5.' },
+                    'xbox-series-x': { compatible: false, score: 5, details: 'Not supported for gaming on Xbox consoles.' },
+                    'nintendo-switch': { compatible: false, score: 5, details: 'Not compatible with Nintendo Switch.' }
+                }
+            },
+            
+            // Hardware compatibility
+            hardware: {
+                gpu: {
+                    'pc': { 
+                        'Cyberpunk 2077': { compatible: true, score: 85, details: 'Meets recommended requirements for 1080p gameplay.' },
+                        'Elden Ring': { compatible: true, score: 90, details: 'Exceeds minimum requirements for smooth gameplay.' },
+                        'Call of Duty: Warzone': { compatible: true, score: 75, details: 'Meets minimum requirements but may need settings adjusted.' }
+                    }
+                },
+                cpu: {
+                    'pc': {
+                        'Cyberpunk 2077': { compatible: true, score: 80, details: 'Meets minimum requirements but may bottleneck high-end GPUs.' },
+                        'Elden Ring': { compatible: true, score: 95, details: 'Exceeds recommended requirements for optimal performance.' },
+                        'Call of Duty: Warzone': { compatible: true, score: 70, details: 'Barely meets minimum requirements. Consider upgrading.' }
+                    }
+                },
+                ram: {
+                    'pc': {
+                        'Cyberpunk 2077': { compatible: true, score: 90, details: '16GB is perfect for this game at high settings.' },
+                        'Elden Ring': { compatible: true, score: 85, details: '16GB is more than enough for smooth gameplay.' },
+                        'Call of Duty: Warzone': { compatible: true, score: 80, details: 'Meets requirements but more RAM would help with multitasking.' }
+                    }
+                },
+                storage: {
+                    'pc': {
+                        'Cyberpunk 2077': { compatible: true, score: 100, details: 'SSD highly recommended for best loading times.' },
+                        'Elden Ring': { compatible: true, score: 95, details: 'SSD will significantly improve loading times.' },
+                        'Call of Duty: Warzone': { compatible: true, score: 90, details: 'SSD recommended for faster map loading.' }
+                    }
+                }
+            },
+            
+            // Game compatibility
+            games: {
+                'Cyberpunk 2077': {
+                    'pc': { compatible: true, score: 100, details: 'Fully compatible with PC. Check hardware requirements for optimal performance.' },
+                    'ps5': { compatible: true, score: 100, details: 'Native PS5 version available with all enhancements.' },
+                    'xbox-series-x': { compatible: true, score: 100, details: 'Native Xbox Series X version available with all enhancements.' },
+                    'nintendo-switch': { compatible: false, score: 0, details: 'Not available on Nintendo Switch.' }
+                },
+                'Elden Ring': {
+                    'pc': { compatible: true, score: 95, details: 'Fully compatible but performance may vary based on hardware.' },
+                    'ps5': { compatible: true, score: 100, details: 'Runs perfectly on PS5 with performance or quality modes.' },
+                    'xbox-series-x': { compatible: true, score: 100, details: 'Runs perfectly on Xbox Series X with performance or quality modes.' },
+                    'nintendo-switch': { compatible: false, score: 0, details: 'Not available on Nintendo Switch.' }
+                },
+                'Call of Duty: Warzone': {
+                    'pc': { compatible: true, score: 100, details: 'Fully compatible but requires significant storage space.' },
+                    'ps5': { compatible: true, score: 100, details: 'Native PS5 version available with 120Hz support.' },
+                    'xbox-series-x': { compatible: true, score: 100, details: 'Native Xbox Series X version available with 120Hz support.' },
+                    'nintendo-switch': { compatible: false, score: 0, details: 'Not available on Nintendo Switch.' }
+                }
+            }
+        };
+
+        // Sample product recommendations
+        const productRecommendations = {
+            'controller': [
+                { name: 'Pro Gaming Controller', price: '$59.99', image: 'https://via.placeholder.com/150?text=Controller' },
+                { name: 'Wireless Elite Controller', price: '$129.99', image: 'https://via.placeholder.com/150?text=Elite+Controller' },
+                { name: 'Compact Travel Controller', price: '$39.99', image: 'https://via.placeholder.com/150?text=Travel+Controller' }
+            ],
+            'headset': [
+                { name: 'Surround Sound Headset', price: '$89.99', image: 'https://via.placeholder.com/150?text=Gaming+Headset' },
+                { name: 'Wireless Gaming Headset', price: '$149.99', image: 'https://via.placeholder.com/150?text=Wireless+Headset' },
+                { name: 'Budget Gaming Headphones', price: '$49.99', image: 'https://via.placeholder.com/150?text=Budget+Headset' }
+            ],
+            'gpu': [
+                { name: 'RTX 3080 Graphics Card', price: '$799.99', image: 'https://via.placeholder.com/150?text=RTX+3080' },
+                { name: 'RX 6800 XT GPU', price: '$649.99', image: 'https://via.placeholder.com/150?text=RX+6800' },
+                { name: 'Budget Gaming GPU', price: '$299.99', image: 'https://via.placeholder.com/150?text=Budget+GPU' }
+            ],
+            'cpu': [
+                { name: 'Intel Core i9-12900K', price: '$599.99', image: 'https://via.placeholder.com/150?text=i9-12900K' },
+                { name: 'AMD Ryzen 9 5900X', price: '$549.99', image: 'https://via.placeholder.com/150?text=Ryzen+9' },
+                { name: 'Mid-Range Processor', price: '$299.99', image: 'https://via.placeholder.com/150?text=Mid+CPU' }
+            ]
+        };
+
+        // DOM elements
+        const deviceTypeSelect = document.getElementById('device-type');
+        const accessoryTypeSelect = document.getElementById('accessory-type');
+        const hardwareTypeSelect = document.getElementById('hardware-type');
+        const gameNameInput = document.getElementById('game-name');
+        const platformSelect = document.getElementById('platform');
+        const checkButton = document.getElementById('check-btn');
+        const newCheckButton = document.getElementById('new-check-btn');
+        const resultsSection = document.getElementById('results-section');
+        const inputSection = document.querySelector('.input-section');
+
+        // Result elements
+        const scoreValue = document.getElementById('score-value');
+        const resultDevice = document.getElementById('result-device');
+        const resultPlatform = document.getElementById('result-platform');
+        const resultStatus = document.getElementById('result-status');
+        const resultDetails = document.getElementById('result-details');
+        const productsGrid = document.getElementById('products-grid');
+        const recommendationsSection = document.getElementById('recommendations');
+
+        // Event listeners
+        deviceTypeSelect.addEventListener('change', handleDeviceTypeChange);
+        checkButton.addEventListener('click', checkCompatibility);
+        newCheckButton.addEventListener('click', resetChecker);
+
+        // Enable/disable form elements based on device type selection
+        function handleDeviceTypeChange() {
+            const deviceType = deviceTypeSelect.value;
+            
+            // Reset all optional fields
+            accessoryTypeSelect.disabled = true;
+            hardwareTypeSelect.disabled = true;
+            gameNameInput.disabled = true;
+            platformSelect.disabled = true;
+            checkButton.disabled = true;
+            
+            // Enable relevant fields based on selection
+            if (deviceType === 'accessory') {
+                accessoryTypeSelect.disabled = false;
+                platformSelect.disabled = false;
+            } else if (deviceType === 'hardware') {
+                hardwareTypeSelect.disabled = false;
+                gameNameInput.disabled = false;
+            } else if (deviceType === 'game') {
+                gameNameInput.disabled = false;
+                platformSelect.disabled = false;
+            }
+            
+            // Enable platform select for all except hardware (which is PC only)
+            if (deviceType && deviceType !== 'hardware') {
+                platformSelect.disabled = false;
+            }
+            
+            // Enable check button when all required fields are filled
+            if (deviceType) {
+                checkButton.disabled = false;
+            }
+        }
+
+        // Check compatibility based on user input
+        function checkCompatibility() {
+            const deviceType = deviceTypeSelect.value;
+            let compatibilityResult = null;
+            let deviceName = '';
+            let platform = platformSelect.value;
+            
+            // Get compatibility data based on device type
+            if (deviceType === 'accessory') {
+                const accessoryType = accessoryTypeSelect.value;
+                deviceName = accessoryTypeSelect.options[accessoryTypeSelect.selectedIndex].text;
+                compatibilityResult = compatibilityDB.accessories[accessoryType][platform];
+            } 
+            else if (deviceType === 'hardware') {
+                const hardwareType = hardwareTypeSelect.value;
+                const gameName = gameNameInput.value.trim();
+                deviceName = hardwareTypeSelect.options[hardwareTypeSelect.selectedIndex].text;
+                
+                // For hardware, we check against specific games (PC only)
+                if (gameName && compatibilityDB.hardware[hardwareType]['pc'][gameName]) {
+                    compatibilityResult = compatibilityDB.hardware[hardwareType]['pc'][gameName];
+                    platform = 'pc';
+                } else {
+                    compatibilityResult = { compatible: false, score: 0, details: 'No compatibility data available for this hardware/game combination.' };
+                }
+            }
+            else if (deviceType === 'game') {
+                const gameName = gameNameInput.value.trim();
+                deviceName = gameName;
+                
+                if (gameName && compatibilityDB.games[gameName] && compatibilityDB.games[gameName][platform]) {
+                    compatibilityResult = compatibilityDB.games[gameName][platform];
+                } else {
+                    compatibilityResult = { compatible: false, score: 0, details: 'No compatibility data available for this game/platform combination.' };
+                }
+            }
+            
+            // Display results
+            displayResults(deviceName, platform, compatibilityResult);
+            
+            // Show recommendations if available
+            if (compatibilityResult.score < 80) {
+                showRecommendations(deviceType === 'accessory' ? accessoryTypeSelect.value : hardwareTypeSelect.value);
+            } else {
+                recommendationsSection.classList.add('hidden');
+            }
+            
+            // Hide input section and show results
+            inputSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+        }
+
+        // Display compatibility results
+        function displayResults(device, platform, result) {
+            scoreValue.textContent = result.score;
+            resultDevice.textContent = device;
+            resultPlatform.textContent = platformSelect.options[platformSelect.selectedIndex].text;
+            
+            // Update score color based on value
+            if (result.score >= 80) {
+                scoreValue.style.color = '#00b894'; // Green
+                resultStatus.textContent = 'Fully Compatible';
+                resultStatus.style.color = '#00b894';
+            } else if (result.score >= 50) {
+                scoreValue.style.color = '#fdcb6e'; // Yellow
+                resultStatus.textContent = 'Partially Compatible';
+                resultStatus.style.color = '#fdcb6e';
+            } else {
+                scoreValue.style.color = '#d63031'; // Red
+                resultStatus.textContent = 'Not Compatible';
+                resultStatus.style.color = '#d63031';
+            }
+            
+            resultDetails.textContent = result.details;
+        }
+
+        // Show product recommendations
+        function showRecommendations(category) {
+            if (productRecommendations[category]) {
+                productsGrid.innerHTML = '';
+                
+                productRecommendations[category].forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <h4>${product.name}</h4>
+                        <div class="price">${product.price}</div>
+                    `;
+                    productsGrid.appendChild(productCard);
+                });
+                
+                recommendationsSection.classList.remove('hidden');
+            }
+        }
+
+        // Reset the checker for a new search
+        function resetChecker() {
+            // Reset form
+            deviceTypeSelect.value = '';
+            accessoryTypeSelect.value = '';
+            hardwareTypeSelect.value = '';
+            gameNameInput.value = '';
+            platformSelect.value = '';
+            
+            // Reset UI
+            inputSection.classList.remove('hidden');
+            resultsSection.classList.add('hidden');
+            recommendationsSection.classList.add('hidden');
+            
+            // Reset fields
+            handleDeviceTypeChange();
+        }
+    </script>
+</body>
+</html>

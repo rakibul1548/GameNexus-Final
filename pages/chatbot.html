@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameZone - AI Shopping Assistant</title>
+    <style>
+        /* CSS Styles (updated with cart features) */
+        :root {
+            --primary: #6e48aa;
+            --secondary: #9d50bb;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000a0e;
+            color: #333;
+        }
+        
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 380px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .chatbot-container.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chatbot-header h3 {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chatbot-header h3 i {
+            font-size: 1.2rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .chatbot-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bot-message {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            align-self: flex-start;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-message {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .quick-reply {
+            background: rgba(255, 255, 255, 0.986);
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-reply:hover {
+            background: #f0f0f0;
+        }
+        
+        .chatbot-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+        
+        .chatbot-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+        
+        #user-input:focus {
+            border-color: var(--primary);
+        }
+        
+        #send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        #send-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(110, 72, 170, 0.4);
+            z-index: 999;
+        }
+        
+        .chatbot-toggle i {
+            font-size: 1.5rem;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+        
+        .product-image {
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .product-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+        
+        .product-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .product-btn.added {
+            background: var(--success);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #ccc;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        .system-message {
+            background: #e9ecef;
+            color: #495057;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .cart-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-total {
+            font-weight: bold;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .checkout-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+        
+        .checkout-btn:hover {
+            background: #3aa8d8;
+        }
+        
+        .cart-empty {
+            color: #777;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Chatbot Toggle Button -->
+    <div class="chatbot-toggle" id="chatbot-toggle">
+        <i class="fas fa-robot"></i>
+        <span class="cart-count" id="cart-count" style="display: none;"></span>
+    </div>
+    
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbot-container">
+        <div class="chatbot-header">
+            <h3><i class="fas fa-robot"></i> GameZone Assistant</h3>
+            <button class="close-btn" id="close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chatbot-body" id="chatbot-body">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="chatbot-footer">
+            <div class="chatbot-input">
+                <input type="text" id="user-input" placeholder="Ask about games, hardware, or orders..." autocomplete="off">
+                <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const chatbotToggle = document.getElementById('chatbot-toggle');
+        const chatbotContainer = document.getElementById('chatbot-container');
+        const closeBtn = document.getElementById('close-btn');
+        const chatbotBody = document.getElementById('chatbot-body');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const cartCount = document.getElementById('cart-count');
+        
+        // Shopping cart
+        let cart = [];
+        
+        // Game database (mock data)
+        const games = [
+            { id: 1, name: "Elden Ring", price: 59.99, platform: ["PC", "PS5", "Xbox Series X"], genre: "RPG", image: "https://image.api.playstation.com/vulcan/ap/rnd/202107/1600/aGhopp1wqkzQ6UxLzgWXUijZ.jpg" },
+            { id: 2, name: "Call of Duty: Warzone", price: 0, platform: ["PC", "PS4", "PS5", "Xbox One", "Xbox Series X"], genre: "FPS", image: "https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/warzone/common/social-share/mw-wz-social-share.jpg" },
+            { id: 3, name: "Cyberpunk 2077", price: 49.99, platform: ["PC", "PS5", "Xbox Series X"], genre: "RPG", image: "https://image.api.playstation.com/vulcan/ap/rnd/202101/2923/T3sM8yXKZuyqOeVOmkDlXGx3.png" },
+            { id: 4, name: "FIFA 23", price: 69.99, platform: ["PC", "PS5", "Xbox Series X"], genre: "Sports", image: "https://image.api.playstation.com/vulcan/ap/rnd/202207/1218/4xJtAB3sUF6DZsgalzHlXwZl.png" }
+        ];
+        
+        // Hardware database (mock data)
+        const hardware = [
+            { id: 101, name: "NVIDIA RTX 4090", price: 1599.99, type: "GPU", image: "https://m.media-amazon.com/images/I/61uHkIUaUIL._AC_SL1500_.jpg" },
+            { id: 102, name: "PlayStation 5", price: 499.99, type: "Console", image: "https://m.media-amazon.com/images/I/51zLZbEVSTL._AC_SL1500_.jpg" },
+            { id: 103, name: "Razer BlackWidow V3", price: 139.99, type: "Keyboard", image: "https://m.media-amazon.com/images/I/71tG5V+8kIL._AC_SL1500_.jpg" },
+            { id: 104, name: "Logitech G Pro X", price: 129.99, type: "Headset", image: "https://m.media-amazon.com/images/I/61O35otXuOL._AC_SL1500_.jpg" }
+        ];
+        
+        // Orders database (mock data)
+        const orders = [
+            { id: "ORD1001", status: "Shipped", items: ["Elden Ring (PS5)", "PlayStation Plus 12-Month"], total: 109.98, tracking: "UPS #1Z12345E0205271688" },
+            { id: "ORD1002", status: "Processing", items: ["NVIDIA RTX 4090"], total: 1599.99, tracking: null }
+        ];
+        
+        // Initialize chatbot
+        let isChatbotOpen = false;
+        
+        // Toggle chatbot visibility
+        chatbotToggle.addEventListener('click', () => {
+            isChatbotOpen = !isChatbotOpen;
+            chatbotContainer.classList.toggle('active', isChatbotOpen);
+            
+            if (isChatbotOpen) {
+                // Add welcome message if first time opening
+                if (chatbotBody.children.length === 0) {
+                    addBotMessage("Hi there! I'm GameZone Assistant. How can I help you today? 😊", [
+                        "Recommend me a game",
+                        "Check my order status",
+                        "What PC parts do I need?",
+                        "View my cart"
+                    ]);
+                }
+            }
+        });
+        
+        closeBtn.addEventListener('click', () => {
+            isChatbotOpen = false;
+            chatbotContainer.classList.remove('active');
+        });
+        
+        // Send message on button click
+        sendBtn.addEventListener('click', sendMessage);
+        
+        // Send message on Enter key
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Function to send a message
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === '') return;
+            
+            addUserMessage(message);
+            userInput.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate bot thinking time
+            setTimeout(() => {
+                // Remove typing indicator
+                removeTypingIndicator();
+                
+                // Process the message and generate response
+                processUserMessage(message);
+            }, 1000 + Math.random() * 2000);
+        }
+        
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatbotBody.appendChild(typingIndicator);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+        
+        // Function to remove typing indicator
+        function removeTypingIndicator() {
+            const typingIndicators = document.querySelectorAll('.typing-indicator');
+            typingIndicators.forEach(indicator => {
+                chatbotBody.removeChild(indicator);
+            });
+        }
+        
+        // Function to add a user message to the chat
+        function addUserMessage(text) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message user-message';
+            messageElement.textContent = text;
+            chatbotBody.appendChild(messageElement);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+        
+        // Function to add a bot message to the chat
+        function addBotMessage(text, quickReplies = []) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message bot-message';
+            messageElement.innerHTML = text;
+            
+            if (quickReplies.length > 0) {
+                const quickRepliesContainer = document.createElement('div');
+                quickRepliesContainer.className = 'quick-replies';
+                
+                quickReplies.forEach(reply => {
+                    const quickReply = document.createElement('div');
+                    quickReply.className = 'quick-reply';
+                    quickReply.textContent = reply;
+                    quickReply.addEventListener('click', () => {
+                        addUserMessage(reply);
+                        showTypingIndicator();
+                        setTimeout(() => {
+                            removeTypingIndicator();
+                            processUserMessage(reply);
+                        }, 1000 + Math.random() * 2000);
+                    });
+                    
+                    quickRepliesContainer.appendChild(quickReply);
+                });
+                
+                messageElement.appendChild(quickRepliesContainer);
+            }
+            
+            chatbotBody.appendChild(messageElement);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+        
+        // Function to add a product card to the chat
+        function addProductCard(product) {
+            const isInCart = cart.some(item => item.id === product.id);
+            
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.innerHTML = `
+                <div class="product-image" style="background-image: url('${product.image}')"></div>
+                <div class="product-info">
+                    <div class="product-title">${product.name}</div>
+                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                    <button class="product-btn ${isInCart ? 'added' : ''}" 
+                            onclick="addToCart(${product.id}, this)">
+                        ${isInCart ? '✓ Added to Cart' : 'Add to Cart'}
+                    </button>
+                </div>
+            `;
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message bot-message';
+            messageElement.appendChild(productCard);
+            chatbotBody.appendChild(messageElement);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+        
+        // Function to add item to cart
+        window.addToCart = function(productId, buttonElement) {
+            const product = [...games, ...hardware].find(p => p.id === productId);
+            
+            if (!product) return;
+            
+            // Check if product is already in cart
+            const existingItemIndex = cart.findIndex(item => item.id === productId);
+            
+            if (existingItemIndex >= 0) {
+                // Item already in cart - remove it
+                cart.splice(existingItemIndex, 1);
+                if (buttonElement) {
+                    buttonElement.classList.remove('added');
+                    buttonElement.textContent = 'Add to Cart';
+                }
+                addSystemMessage(`Removed ${product.name} from your cart.`);
+            } else {
+                // Add new item to cart
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1
+                });
+                if (buttonElement) {
+                    buttonElement.classList.add('added');
+                    buttonElement.textContent = '✓ Added to Cart';
+                }
+                addSystemMessage(`Added ${product.name} to your cart!`);
+            }
+            
+            // Update cart count
+            updateCartCount();
+        }
+        
+        // Function to update cart count display
+        function updateCartCount() {
+            if (cart.length > 0) {
+                cartCount.textContent = cart.length;
+                cartCount.style.display = 'flex';
+                cartCount.style.position = 'absolute';
+                cartCount.style.top = '-5px';
+                cartCount.style.right = '-5px';
+                cartCount.style.background = 'var(--danger)';
+                cartCount.style.color = 'white';
+                cartCount.style.borderRadius = '50%';
+                cartCount.style.width = '20px';
+                cartCount.style.height = '20px';
+                cartCount.style.justifyContent = 'center';
+                cartCount.style.alignItems = 'center';
+                cartCount.style.fontSize = '12px';
+            } else {
+                cartCount.style.display = 'none';
+            }
+        }
+        
+        // Function to display cart contents
+        function showCart() {
+            if (cart.length === 0) {
+                addBotMessage("Your cart is currently empty. Can I help you find something?");
+                return;
+            }
+            
+            let cartHTML = '<div class="cart-summary"><h4>Your Cart</h4>';
+            
+            let total = 0;
+            cart.forEach(item => {
+                cartHTML += `
+                    <div class="cart-item">
+                        <span>${item.name}</span>
+                        <span>$${item.price.toFixed(2)}</span>
+                    </div>
+                `;
+                total += item.price;
+            });
+            
+            cartHTML += `
+                <div class="cart-total">Total: $${total.toFixed(2)}</div>
+                <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+            </div>
+            `;
+            
+            addBotMessage(cartHTML);
+        }
+        
+        // Function to proceed to checkout
+        window.proceedToCheckout = function() {
+            if (cart.length === 0) return;
+            
+            addSystemMessage("Redirecting to checkout...");
+            
+            // In a real implementation, this would redirect to your checkout page
+            // For this demo, we'll simulate it
+            setTimeout(() => {
+                addBotMessage("You would now be taken to the secure checkout page. Would you like to continue shopping?", [
+                    "Yes, show me more games",
+                    "No, I'm done"
+                ]);
+                
+                // Clear cart after checkout
+                cart = [];
+                updateCartCount();
+            }, 1500);
+        }
+        
+        // Function to process user messages and generate responses
+        function processUserMessage(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Check for greetings
+            if (lowerMessage.includes('hi') || lowerMessage.includes('hello') || lowerMessage.includes('hey')) {
+                addBotMessage("Hello again! How can I assist you with your gaming needs today? 🎮", [
+                    "Looking for a new game",
+                    "Need PC hardware advice",
+                    "Check my order status",
+                    "View my cart"
+                ]);
+                return;
+            }
+            
+            // Check for cart-related messages
+            if (lowerMessage.includes('cart') || lowerMessage.includes('basket') || lowerMessage.includes('view my cart')) {
+                showCart();
+                if (cart.length > 0) {
+                    addBotMessage("Would you like to continue shopping or proceed to checkout?", [
+                        "Show me more games",
+                        "Show me hardware",
+                        "Proceed to checkout"
+                    ]);
+                }
+                return;
+            }
+            
+            // Check for checkout messages
+            if (lowerMessage.includes('checkout') || lowerMessage.includes('proceed to checkout')) {
+                proceedToCheckout();
+                return;
+            }
+            
+            // Check for game recommendations
+            if (lowerMessage.includes('game') || lowerMessage.includes('recommend') || lowerMessage.includes('suggest')) {
+                if (lowerMessage.includes('rpg')) {
+                    const rpgGames = games.filter(game => game.genre === "RPG");
+                    addBotMessage("Here are some great RPG games you might enjoy:");
+                    rpgGames.forEach(game => addProductCard(game));
+                    addBotMessage("Would you like recommendations for other genres?", [
+                        "FPS games",
+                        "Sports games",
+                        "View my cart",
+                        "No thanks"
+                    ]);
+                } else if (lowerMessage.includes('fps')) {
+                    const fpsGames = games.filter(game => game.genre === "FPS");
+                    addBotMessage("Check out these popular FPS games:");
+                    fpsGames.forEach(game => addProductCard(game));
+                } else if (lowerMessage.includes('sports')) {
+                    const sportsGames = games.filter(game => game.genre === "Sports");
+                    addBotMessage("Here are some exciting sports games:");
+                    sportsGames.forEach(game => addProductCard(game));
+                } else {
+                    addBotMessage("What type of games are you interested in? 🎮", [
+                        "RPG games",
+                        "FPS games",
+                        "Sports games",
+                        "View my cart"
+                    ]);
+                }
+                return;
+            }
+            
+            // Check for hardware questions
+            if (lowerMessage.includes('hardware') || lowerMessage.includes('pc') || lowerMessage.includes('setup') || 
+                lowerMessage.includes('gpu') || lowerMessage.includes('cpu') || lowerMessage.includes('headset') || 
+                lowerMessage.includes('keyboard') || lowerMessage.includes('mouse')) {
+                
+                if (lowerMessage.includes('headset')) {
+                    const headsets = hardware.filter(item => item.type === "Headset");
+                    addBotMessage("Here are our top gaming headsets:");
+                    headsets.forEach(item => addProductCard(item));
+                } else if (lowerMessage.includes('gpu') || lowerMessage.includes('graphics')) {
+                    const gpus = hardware.filter(item => item.type === "GPU");
+                    addBotMessage("Check out these powerful GPUs for gaming:");
+                    gpus.forEach(item => addProductCard(item));
+                } else if (lowerMessage.includes('console')) {
+                    const consoles = hardware.filter(item => item.type === "Console");
+                    addBotMessage("Here are the latest gaming consoles:");
+                    consoles.forEach(item => addProductCard(item));
+                } else {
+                    addBotMessage("What hardware are you looking for? 💻", [
+                        "Graphics cards",
+                        "Gaming headsets",
+                        "Gaming consoles",
+                        "View my cart"
+                    ]);
+                }
+                return;
+            }
+            
+            // Check for order status
+            if (lowerMessage.includes('order') || lowerMessage.includes('status') || lowerMessage.includes('track')) {
+                if (lowerMessage.includes('1001')) {
+                    const order = orders.find(o => o.id === "ORD1001");
+                    addBotMessage(`Order #${order.id} is ${order.status}.<br>Items: ${order.items.join(', ')}<br>Total: $${order.total.toFixed(2)}<br>Tracking: ${order.tracking}`);
+                } else if (lowerMessage.includes('1002')) {
+                    const order = orders.find(o => o.id === "ORD1002");
+                    addBotMessage(`Order #${order.id} is ${order.status}.<br>Items: ${order.items.join(', ')}<br>Total: $${order.total.toFixed(2)}`);
+                } else {
+                    addBotMessage("I can check your order status. Please provide your order number or choose from recent orders:", [
+                        "ORD1001",
+                        "ORD1002",
+                        "View my cart"
+                    ]);
+                }
+                return;
+            }
+            
+            // Check for compatibility questions
+            if (lowerMessage.includes('run') || lowerMessage.includes('compatib') || lowerMessage.includes('requirement')) {
+                if (lowerMessage.includes('cyberpunk')) {
+                    addBotMessage("To run Cyberpunk 2077 at recommended settings, you'll need:<br><br>" +
+                        "• OS: Windows 10 64-bit<br>" +
+                        "• CPU: Intel Core i7-4790 or AMD Ryzen 3 3200G<br>" +
+                        "• RAM: 12GB<br>" +
+                        "• GPU: GTX 1060 6GB / GTX 1660 Super or Radeon RX 590<br>" +
+                        "• Storage: 70GB SSD<br><br>" +
+                        "Would you like me to recommend hardware upgrades?", [
+                            "Yes, show me GPUs",
+                            "No thanks",
+                            "View my cart"
+                        ]);
+                } else if (lowerMessage.includes('elden ring')) {
+                    addBotMessage("Elden Ring system requirements:<br><br>" +
+                        "Minimum:<br>" +
+                        "• OS: Windows 10<br>" +
+                        "• CPU: Intel Core i5-8400 or AMD Ryzen 3 3300X<br>" +
+                        "• RAM: 12GB<br>" +
+                        "• GPU: NVIDIA GeForce GTX 1060 3GB or AMD Radeon RX 580 4GB<br><br>" +
+                        "Recommended:<br>" +
+                        "• GPU: NVIDIA GeForce GTX 1070 8GB or AMD Radeon RX Vega 56 8GB");
+                } else {
+                    addBotMessage("I can check game compatibility. Which game are you wondering about?", [
+                        "Cyberpunk 2077",
+                        "Elden Ring",
+                        "Call of Duty: Warzone",
+                        "View my cart"
+                    ]);
+                }
+                return;
+            }
+            
+            // Default response
+            addBotMessage("I'm not sure I understand. How can I help you with your gaming needs?", [
+                "Game recommendations",
+                "Hardware advice",
+                "Order status",
+                "View my cart"
+            ]);
+        }
+        
+        // Function to add system messages
+        function addSystemMessage(text) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'system-message';
+            messageElement.textContent = text;
+            chatbotBody.appendChild(messageElement);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+        
+        // Initialize with welcome message when opened for the first time
+        chatbotToggle.click();
+    </script>
+</body>
+</html>
